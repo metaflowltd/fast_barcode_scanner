@@ -30,6 +30,7 @@ class BarcodeCamera extends StatefulWidget {
     this.position = CameraPosition.back,
     this.onScan,
     this.children = const [],
+    this.onInit,
     ErrorCallback? onError,
   })  : onError = onError ?? _defaultOnError,
         super(key: key);
@@ -42,6 +43,7 @@ class BarcodeCamera extends StatefulWidget {
   final void Function(Barcode)? onScan;
   final List<Widget> children;
   final ErrorCallback onError;
+  final void Function()? onInit;
 
   @override
   BarcodeCameraState createState() => BarcodeCameraState();
@@ -55,9 +57,11 @@ class BarcodeCameraState extends State<BarcodeCamera> {
     super.didChangeDependencies();
 
     CameraController.instance
-        .initialize(widget.types, widget.resolution, widget.framerate,
-            widget.mode, widget.position, widget.onScan)
-        .whenComplete(() => setState(() => _opacity = 1.0));
+        .initialize(widget.types, widget.resolution, widget.framerate, widget.mode, widget.position, widget.onScan)
+        .whenComplete(() {
+      setState(() => _opacity = 1.0);
+      widget.onInit?.call();
+    });
   }
 
   @override
